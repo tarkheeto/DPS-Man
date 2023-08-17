@@ -1,0 +1,11 @@
+Com 30 station
+Com 36 Game Controller
+
+
+
+Over Time the delta value changes however it generally hovers around between -26 and -29
+		Need some sort of stabilization mechanism
+
+
+
+
