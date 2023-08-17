@@ -8,4 +8,5 @@ Over Time the delta value changes however it generally hovers around between -26
 
 
 
-
+Adaptive thresholding:
+	Take N measurements and take average and dependant of how often there are changes to the value
