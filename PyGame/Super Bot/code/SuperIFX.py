@@ -2,7 +2,7 @@ import pygame, sys
 import serial
 from random import randint, uniform
 
-gameMode=True
+gameMode=False
 
 
 #Calibration
@@ -152,6 +152,7 @@ scoreTimer=pygame.event.custom_type()
 pygame.time.set_timer(scoreTimer,1000)
 
 bg_surf = pygame.image.load('PyGame/Super Bot/graphics/background.jpg').convert()
+startScreenSurf=pygame.image.load('PyGame/Super Bot/graphics/Start Screen.png').convert()
 
 posY = 360
 posX = 0
@@ -223,8 +224,7 @@ while True:  # run forever -> keeps our game running
 
 
 		if(gameMode):
-			if(event.type==cloudTimer):
-				
+			if(event.type==cloudTimer):				
 				cloudClass((2200,randint(0,1080)),500, cloudGroup)				
 				print("schblanga")
 			if(event.type==scoreTimer):
@@ -237,6 +237,10 @@ while True:  # run forever -> keeps our game running
 			sys.exit()
 
 
+		if event.type == pygame.KEYDOWN:
+			if event.key == pygame.K_s:
+				gameMode=True
+
 	#
 	
 	clock.tick()
@@ -246,21 +250,17 @@ while True:  # run forever -> keeps our game running
 	hero.center = (200, posY)
 
 	display_surface.fill((0, 0, 0))
-	display_surface.blit(bg_surf, (0, 0))
-
-	hero.collisionsWithClouds()
-
-	#Updating our Groups
-	cloudGroup.update()
-
-	#Drawing our Groups
-	spriteGroup.draw(display_surface)
-	cloudGroup.draw(display_surface)
-
-
-
-	display_score()
-	#Add eventually a blit for the obstacles
+	display_surface.blit(startScreenSurf, (0, 0))
+	if(gameMode):
+		display_surface.blit(bg_surf, (0, 0))
+		hero.collisionsWithClouds()
+		#Updating our Groups
+		cloudGroup.update()
+		#Drawing our Groups
+		spriteGroup.draw(display_surface)
+		cloudGroup.draw(display_surface)
+		display_score()
+		#Add eventually a blit for the obstacles
 
 
 	pygame.display.update()
