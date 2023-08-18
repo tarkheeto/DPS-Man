@@ -199,7 +199,7 @@ while True:  # run forever -> keeps our game running
 	# Only compute the delta if both values are present
 		if base_value is not None and controller_value is not None:
 			delta = int(controller_value - base_value)
-			print(f"Base Station Value: {base_value}, Dynamic Controller Value: {controller_value}, Delta: {delta}")
+			#print(f"Base Station Value: {base_value}, Dynamic Controller Value: {controller_value}, Delta: {delta}")
 
 			if delta > upperThreshold:
 				flagDown = True
@@ -244,6 +244,11 @@ while True:  # run forever -> keeps our game running
 			if event.key == pygame.K_s:
 				score=0
 				gameMode=True
+
+		if event.type ==pygame.KEYDOWN:
+			if event.key == pygame.K_a:
+				counterFirstCalibration=0
+
 				
 
 	#
