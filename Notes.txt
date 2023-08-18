@@ -51,3 +51,25 @@ clock.tick returns how long it takes to draw a frame
 
 
 
+A method has to always have atleast one parameter
+
+
+A dunder method is a method that is not called by the user
+Instead, it is called by python when something happens
+__init__ is called when the object is created
+
+you can dunder len or abs 
+in order to return a specific value for example
+
+def __len__(self):  
+    return self.health
+
+
+dunder dir gives you all dunder methods in the class
+
+dunder dict is important
+print(monster1.__dict__)
+print(vars(monster1))
+
+
+you need a group for displaying your sprites

@@ -60,12 +60,39 @@ clock = pygame.time.Clock()
 
 
 
-#PyGame/Super Bot/graphics/ifxBotHorizontal.png
-# importing images 
-# Using sprites
-ship_surf = pygame.image.load('PyGame/Super Bot/graphics/ifxBotHorizontal.png').convert_alpha()
-ship_surf = pygame.transform.scale(ship_surf, (180, 80))
-ship_rect = ship_surf.get_rect(center=(WINDOW_WIDTH / 2, WINDOW_HEIGHT / 2))
+
+
+
+#Sprites
+class ifxMan(pygame.sprite.Sprite):
+	def __init__(self):		
+		super().__init__()   #1 init the parent class
+		#2 we need a surface -> image
+		self.image = pygame.image.load('PyGame/Super Bot/graphics/ifxBotHorizontal.png').convert_alpha()
+		self.image=pygame.transform.scale(self.image, (180, 80))
+		#3 we need a rect
+		self.rect = self.image.get_rect(midtop=(WINDOW_WIDTH / 4, WINDOW_HEIGHT / 2))
+		
+
+		
+#Sprite Groups
+ifxManGroup = pygame.sprite.Group()
+
+
+
+#Sprite Creation
+hero = ifxMan()
+ifxManGroup.add(hero)
+
+
+
+
+
+
+
+
+
+
 bg_surf = pygame.image.load('PyGame/Super Bot/graphics/background.png').convert()
 
 posY = 360
@@ -117,11 +144,11 @@ while True:  # run forever -> keeps our game running
 			# Keep the current flags if data isn't received
 			pass
 
-		if ship_rect.top > 10 and flagUp:
-			posY -= 2
+		if hero.rect.top > 10 and flagUp:
+			hero.rect.top -= 2
 
-		if ship_rect.bottom < 710 and flagDown:
-			posY += 2
+		if hero.rect.bottom < 710 and flagDown:
+			hero.rect.bottom += 2
 
 	for event in pygame.event.get():
 		if event.type == pygame.QUIT:
@@ -130,13 +157,18 @@ while True:  # run forever -> keeps our game running
 
 	clock.tick(120)
 
-	# Update ship position
-	ship_rect.center = (200, posY)
+	# Update ifxMan position
+	hero.center = (200, posY)
 
 	display_surface.fill((0, 0, 0))
 	display_surface.blit(bg_surf, (0, 0))
-	display_surface.blit(ship_surf, ship_rect)
-	#Add eventually a blit for the obstacles
+
+
+	#Drawing our Groups
+	ifxManGroup.draw(display_surface)
 	
+
+	#Add eventually a blit for the obstacles
+
 
 	pygame.display.update()
