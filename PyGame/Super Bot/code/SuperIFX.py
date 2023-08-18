@@ -34,7 +34,7 @@ lowerThreshold=0
 
 
 
-
+score=0
 
 
 
@@ -43,7 +43,7 @@ lowerThreshold=0
 
 
 def display_score():
-	score_text = f'Score: {hero.score}'
+	score_text = f'Score: {score}'
 	text_surf = font.render(score_text, True, (255,255,255))
 	text_rect = text_surf.get_rect(midbottom = (WINDOW_WIDTH / 2, WINDOW_HEIGHT - 80))
 	display_surface.blit(text_surf,text_rect)
@@ -94,11 +94,13 @@ class ifxMan(pygame.sprite.Sprite):
 		#3 we need a rect
 		self.rect = self.image.get_rect(midtop=(WINDOW_WIDTH / 4, WINDOW_HEIGHT / 2))
 	score=0
+	
 
 	def collisionsWithClouds(self):
-		if pygame.sprite.spritecollide(self,cloudGroup,False):
-			print("Collision Detected")
-			self.score=0
+		if pygame.sprite.spritecollide(self,cloudGroup,True):
+
+			#print("Collision Detected")
+			return True			
 			
 
 
@@ -126,6 +128,9 @@ class cloudClass(pygame.sprite.Sprite):
 		self.pos += self.direction * self.speed *dt
 		self.rect.center=(round(self.pos.x),round(self.pos.y))
 
+		if self.rect.right < 0:
+			self.kill()
+
 		
 #Sprite Groups
 spriteGroup = pygame.sprite.Group()
@@ -134,10 +139,8 @@ cloudGroup = pygame.sprite.Group()
 
 #Sprite Creation
 hero = ifxMan()
-#cloud = cloudClass()
 spriteGroup.add(hero)
 
-#cloudGroup.add(cloud)
 
 
 
@@ -196,7 +199,7 @@ while True:  # run forever -> keeps our game running
 	# Only compute the delta if both values are present
 		if base_value is not None and controller_value is not None:
 			delta = int(controller_value - base_value)
-			#print(f"Base Station Value: {base_value}, Dynamic Controller Value: {controller_value}, Delta: {delta}")
+			print(f"Base Station Value: {base_value}, Dynamic Controller Value: {controller_value}, Delta: {delta}")
 
 			if delta > upperThreshold:
 				flagDown = True
@@ -216,7 +219,7 @@ while True:  # run forever -> keeps our game running
 		if hero.rect.top > 10 and flagUp:
 			hero.rect.top -= 2
 
-		if hero.rect.bottom < 710 and flagDown:
+		if hero.rect.bottom < 1080 and flagDown:
 			hero.rect.bottom += 2
 
 	for event in pygame.event.get():
@@ -228,7 +231,7 @@ while True:  # run forever -> keeps our game running
 				cloudClass((2200,randint(0,1080)),500, cloudGroup)				
 				print("schblanga")
 			if(event.type==scoreTimer):
-				hero.score+=1
+				score+=1
 		
 			
 
@@ -239,7 +242,9 @@ while True:  # run forever -> keeps our game running
 
 		if event.type == pygame.KEYDOWN:
 			if event.key == pygame.K_s:
+				score=0
 				gameMode=True
+				
 
 	#
 	
@@ -253,14 +258,24 @@ while True:  # run forever -> keeps our game running
 	display_surface.blit(startScreenSurf, (0, 0))
 	if(gameMode):
 		display_surface.blit(bg_surf, (0, 0))
-		hero.collisionsWithClouds()
+		if(hero.collisionsWithClouds()):
+			
+			gameMode=False
+			
 		#Updating our Groups
 		cloudGroup.update()
 		#Drawing our Groups
 		spriteGroup.draw(display_surface)
 		cloudGroup.draw(display_surface)
-		display_score()
-		#Add eventually a blit for the obstacles
+
+
+	display_score()
+
+
+
+
+		
+
 
 
 	pygame.display.update()
