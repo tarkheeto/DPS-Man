@@ -81,4 +81,18 @@ colliderect(rect) gives a bool to check if there was a collision between two rec
 when however working with sprites all we can use is:
 
         pygame.sprite.spritecollide(sprite,group,Dokill)
-        
+
+
+
+
+#Now: 
+        Implement SCORE (DONE)
+        Implement a game function, where the game itself runs when a function is called
+            Stuff thatcould be moved into the function:
+                                                        class instantiation 
+
+
+
+Stuff thatcould be moved into the function:
+
+        nvm thats too complicated for now

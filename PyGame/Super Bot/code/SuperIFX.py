@@ -34,6 +34,27 @@ lowerThreshold=0
 
 
 
+
+
+
+
+
+
+
+
+def display_score():
+	score_text = f'Score: {hero.score}'
+	text_surf = font.render(score_text, True, (255,255,255))
+	text_rect = text_surf.get_rect(midbottom = (WINDOW_WIDTH / 2, WINDOW_HEIGHT - 80))
+	display_surface.blit(text_surf,text_rect)
+	pygame.draw.rect(display_surface,(255,255,255),text_rect.inflate(30,30), width = 8, border_radius = 5)
+
+
+#Now we add a 'game screen'
+
+
+
+
 #Serial Connection Initialisation
 base_station = serial.Serial('COM30', 9600, timeout=1)
 dynamic_controller = serial.Serial('COM36', 9600, timeout=1)
@@ -59,8 +80,7 @@ pygame.display.set_caption('Super IFX')
 clock = pygame.time.Clock()
 
 
-
-
+font = pygame.font.Font('PyGame/Super Bot/graphics/subatomic.ttf', 50)
 
 
 
@@ -73,10 +93,13 @@ class ifxMan(pygame.sprite.Sprite):
 		self.image=pygame.transform.scale_by(self.image, 0.1)
 		#3 we need a rect
 		self.rect = self.image.get_rect(midtop=(WINDOW_WIDTH / 4, WINDOW_HEIGHT / 2))
+	score=0
 
 	def collisionsWithClouds(self):
 		if pygame.sprite.spritecollide(self,cloudGroup,False):
 			print("Collision Detected")
+			self.score=0
+			
 
 
 #The creation of this class takes in the position that it should spawn at and the group, that it should belong to
@@ -125,7 +148,8 @@ spriteGroup.add(hero)
 cloudTimer=pygame.event.custom_type()
 pygame.time.set_timer(cloudTimer,5000)
 
-
+scoreTimer=pygame.event.custom_type()
+pygame.time.set_timer(scoreTimer,1000)
 
 bg_surf = pygame.image.load('PyGame/Super Bot/graphics/background.jpg').convert()
 
@@ -134,6 +158,7 @@ posX = 0
 flagUp = False
 flagDown = False
 firstCalibrationFlag=False
+
 
 while True:  # run forever -> keeps our game running
 	if (base_station.in_waiting > 0) and (dynamic_controller.in_waiting > 0) :
@@ -153,13 +178,20 @@ while True:  # run forever -> keeps our game running
 				print(f"Initial Calibration is succesfully done. Offset = {calibratedOffset} lT = {lowerThreshold} UT = {upperThreshold}")
 
 
+
+
+
+
 				
 	#Game only starts to run if the first calibration flag is set to true
 
 
 	#---------LATER INSERT CODE FOR ALSO PRESSING A KEYBOARD BUTTON TO START THE GAME WHICH WILL IN TURN SET A THE GAME MOD FLAG TO ON
 
-	if (firstCalibrationFlag): 
+
+
+	##Delta Value Computation
+	if (firstCalibrationFlag and gameMode): 
 	# Only compute the delta if both values are present
 		if base_value is not None and controller_value is not None:
 			delta = int(controller_value - base_value)
@@ -195,6 +227,8 @@ while True:  # run forever -> keeps our game running
 				
 				cloudClass((2200,randint(0,1080)),500, cloudGroup)				
 				print("schblanga")
+			if(event.type==scoreTimer):
+				hero.score+=1
 		
 			
 
@@ -203,6 +237,7 @@ while True:  # run forever -> keeps our game running
 			sys.exit()
 
 
+	#
 	
 	clock.tick()
 	dt= clock.tick(120)/1000
@@ -222,6 +257,9 @@ while True:  # run forever -> keeps our game running
 	spriteGroup.draw(display_surface)
 	cloudGroup.draw(display_surface)
 
+
+
+	display_score()
 	#Add eventually a blit for the obstacles
 
 
