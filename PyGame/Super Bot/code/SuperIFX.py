@@ -1,6 +1,11 @@
 import pygame, sys
 import serial
 
+
+gameMode=False
+
+
+#Calibration
 class Buffer:
     def __init__(self, size):
         self.size = size
@@ -18,27 +23,19 @@ class Buffer:
         if not self.buffer:
             return 0  # Return 0 or some other default value if buffer is empty
         return sum(self.buffer) / len(self.buffer)
-
-
+    
+#Used to perform the iterations upon which the average is taken to find the offset
 counterFirstCalibration=0
-bufFirstCalibration=Buffer(19)
-
+bufFirstCalibration=Buffer(9)
+#Variables that dictate the delta threshold for determing motion direction (delta +-2)
 upperThreshold=0  
 lowerThreshold=0
 
 
 
-
+#Serial Connection Initialisation
 base_station = serial.Serial('COM30', 9600, timeout=1)
 dynamic_controller = serial.Serial('COM36', 9600, timeout=1)
-
-pygame.init()
-WINDOW_WIDTH, WINDOW_HEIGHT = 1280, 720
-display_surface = pygame.display.set_mode((WINDOW_WIDTH, WINDOW_HEIGHT))
-pygame.display.set_caption('DPS Demo')
-clock = pygame.time.Clock()
-
-
 
 def get_float_from_port(port):
 	"""Try reading a line from a port and convert to float."""
@@ -48,6 +45,21 @@ def get_float_from_port(port):
 	except ValueError:
 		print(f"Couldn't convert '{line}' to float.")
 		return None
+
+
+
+
+
+#Basic Setup
+pygame.init()
+WINDOW_WIDTH, WINDOW_HEIGHT = 1280, 720
+display_surface = pygame.display.set_mode((WINDOW_WIDTH, WINDOW_HEIGHT))
+pygame.display.set_caption('Super IFX')
+clock = pygame.time.Clock()
+
+
+
+
 #PyGame/Super Bot/graphics/ifxBotHorizontal.png
 # importing images 
 # Using sprites
@@ -67,15 +79,24 @@ while True:  # run forever -> keeps our game running
 		base_value = get_float_from_port(base_station)
 		controller_value = get_float_from_port(dynamic_controller)
 
-		if (counterFirstCalibration<20):
+		#BOOT UP DELTA CALIBRATION
+		#IMPLEMENT A WARNING NOT TO MOVE THE CONTROLLER FROM THE SAME SURFACE AS THE BASE STATION
+		if (counterFirstCalibration<10):
 			counterFirstCalibration+=1
 			bufFirstCalibration.add(int(controller_value - base_value))
-			if(counterFirstCalibration==20):
+			if(counterFirstCalibration==10):
 				calibratedOffset=bufFirstCalibration.average()
 				upperThreshold = calibratedOffset + 2
 				lowerThreshold = calibratedOffset -2
 				firstCalibrationFlag=True
 				print(f"Initial Calibration is succesfully done. Offset = {calibratedOffset} lT = {lowerThreshold} UT = {upperThreshold}   ")
+
+
+				
+	#Game only starts to run if the first calibration flag is set to true
+
+
+	#---------LATER INSERT CODE FOR ALSO PRESSING A KEYBOARD BUTTON TO START THE GAME WHICH WILL IN TURN SET A THE GAME MOD FLAG TO ON
 
 	if (firstCalibrationFlag): 
 	# Only compute the delta if both values are present
@@ -102,10 +123,10 @@ while True:  # run forever -> keeps our game running
 		if ship_rect.bottom < 710 and flagDown:
 			posY += 2
 
-		for event in pygame.event.get():
-			if event.type == pygame.QUIT:
-				pygame.quit()
-				sys.exit()
+	for event in pygame.event.get():
+		if event.type == pygame.QUIT:
+			pygame.quit()
+			sys.exit()
 
 	clock.tick(120)
 
@@ -115,5 +136,7 @@ while True:  # run forever -> keeps our game running
 	display_surface.fill((0, 0, 0))
 	display_surface.blit(bg_surf, (0, 0))
 	display_surface.blit(ship_surf, ship_rect)
+	#Add eventually a blit for the obstacles
+	
 
 	pygame.display.update()
