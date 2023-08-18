@@ -29,8 +29,7 @@ This setup allows maximum noise negation as only the difference delta between bo
 
 ### calibration
 
-<pre>
-```python
+``` python
 		if (counterFirstCalibration<10):
 		  counterFirstCalibration+=1
 			bufFirstCalibration.add(int(controller_value - base_value))
@@ -40,6 +39,4 @@ This setup allows maximum noise negation as only the difference delta between bo
 				lowerThreshold = calibratedOffset -2
 				firstCalibrationFlag=True
 				print(f"Initial Calibration is succesfully done. Offset = {calibratedOffset} lT = {lowerThreshold} UT = {upperThreshold}")
-
 ```
-</pre>
