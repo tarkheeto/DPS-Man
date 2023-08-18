@@ -24,6 +24,7 @@ class Buffer:
             return 0  # Return 0 or some other default value if buffer is empty
         return sum(self.buffer) / len(self.buffer)
     
+
 #Used to perform the iterations upon which the average is taken to find the offset
 counterFirstCalibration=0
 bufFirstCalibration=Buffer(9)
@@ -52,7 +53,7 @@ def get_float_from_port(port):
 
 #Basic Setup
 pygame.init()
-WINDOW_WIDTH, WINDOW_HEIGHT = 1280, 720
+WINDOW_WIDTH, WINDOW_HEIGHT = 1920, 1080
 display_surface = pygame.display.set_mode((WINDOW_WIDTH, WINDOW_HEIGHT))
 pygame.display.set_caption('Super IFX')
 clock = pygame.time.Clock()
@@ -73,6 +74,10 @@ class ifxMan(pygame.sprite.Sprite):
 		#3 we need a rect
 		self.rect = self.image.get_rect(midtop=(WINDOW_WIDTH / 4, WINDOW_HEIGHT / 2))
 
+	def collisionsWithClouds(self):
+		if pygame.sprite.spritecollide(self,cloudGroup,False):
+			print("Collision Detected")
+
 
 #The creation of this class takes in the position that it should spawn at and the group, that it should belong to
 #and the speed at which it should move
@@ -80,7 +85,7 @@ class cloudClass(pygame.sprite.Sprite):
 	def __init__(self,pos,speed,groups):
 		super().__init__(groups)
 		self.image=pygame.image.load('PyGame/Super Bot/graphics/cloud.png').convert_alpha()
-		self.image=pygame.transform.scale_by(self.image,0.4)
+		self.image=pygame.transform.scale_by(self.image,0.8)
 
 		#Create the rectangle with the center being at the input pos
 		self.rect = self.image.get_rect(center=pos)
@@ -98,10 +103,6 @@ class cloudClass(pygame.sprite.Sprite):
 		self.pos += self.direction * self.speed *dt
 		self.rect.center=(round(self.pos.x),round(self.pos.y))
 
-		#self.pos.x-=10*dt
-		#self.rect.x=round(self.pos.x)
-		#self.pos += direction * speed * dt 
-		#self.pos.center =(round(self.pos.x),round(self.pos.y))
 		
 #Sprite Groups
 spriteGroup = pygame.sprite.Group()
@@ -126,7 +127,7 @@ pygame.time.set_timer(cloudTimer,5000)
 
 
 
-bg_surf = pygame.image.load('PyGame/Super Bot/graphics/background.png').convert()
+bg_surf = pygame.image.load('PyGame/Super Bot/graphics/background.jpg').convert()
 
 posY = 360
 posX = 0
@@ -149,7 +150,7 @@ while True:  # run forever -> keeps our game running
 				upperThreshold = calibratedOffset + 2
 				lowerThreshold = calibratedOffset -2
 				firstCalibrationFlag=True
-				print(f"Initial Calibration is succesfully done. Offset = {calibratedOffset} lT = {lowerThreshold} UT = {upperThreshold}   ")
+				print(f"Initial Calibration is succesfully done. Offset = {calibratedOffset} lT = {lowerThreshold} UT = {upperThreshold}")
 
 
 				
@@ -177,6 +178,8 @@ while True:  # run forever -> keeps our game running
 			# Keep the current flags if data isn't received
 			pass
 
+		
+
 		if hero.rect.top > 10 and flagUp:
 			hero.rect.top -= 2
 
@@ -190,7 +193,7 @@ while True:  # run forever -> keeps our game running
 		if(gameMode):
 			if(event.type==cloudTimer):
 				
-				cloudClass((1300,randint(100,500)),100, cloudGroup)				
+				cloudClass((2200,randint(0,1080)),500, cloudGroup)				
 				print("schblanga")
 		
 			
@@ -209,6 +212,8 @@ while True:  # run forever -> keeps our game running
 
 	display_surface.fill((0, 0, 0))
 	display_surface.blit(bg_surf, (0, 0))
+
+	hero.collisionsWithClouds()
 
 	#Updating our Groups
 	cloudGroup.update()

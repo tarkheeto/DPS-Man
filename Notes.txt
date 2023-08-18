@@ -73,3 +73,12 @@ print(vars(monster1))
 
 
 you need a group for displaying your sprites
+
+
+colliderect(rect) gives a bool to check if there was a collision between two rectangles
+
+
+when however working with sprites all we can use is:
+
+        pygame.sprite.spritecollide(sprite,group,Dokill)
+        
