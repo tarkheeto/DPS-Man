@@ -1,8 +1,8 @@
 import pygame, sys
 import serial
+from random import randint, uniform
 
-
-gameMode=False
+gameMode=True
 
 
 #Calibration
@@ -69,27 +69,60 @@ class ifxMan(pygame.sprite.Sprite):
 		super().__init__()   #1 init the parent class
 		#2 we need a surface -> image
 		self.image = pygame.image.load('PyGame/Super Bot/graphics/ifxBotHorizontal.png').convert_alpha()
-		self.image=pygame.transform.scale(self.image, (180, 80))
+		self.image=pygame.transform.scale_by(self.image, 0.1)
 		#3 we need a rect
 		self.rect = self.image.get_rect(midtop=(WINDOW_WIDTH / 4, WINDOW_HEIGHT / 2))
-		
 
+
+#The creation of this class takes in the position that it should spawn at and the group, that it should belong to
+#and the speed at which it should move
+class cloudClass(pygame.sprite.Sprite):
+	def __init__(self,pos,speed,groups):
+		super().__init__(groups)
+		self.image=pygame.image.load('PyGame/Super Bot/graphics/cloud.png').convert_alpha()
+		self.image=pygame.transform.scale_by(self.image,0.4)
+
+		#Create the rectangle with the center being at the input pos
+		self.rect = self.image.get_rect(center=pos)
+
+		#For smoother animation Float based positioning
+		#we take in position from the rectanle
+		self.pos=pygame.math.Vector2(self.rect.center)	
+		self.direction=pygame.Vector2(-1,0)
+		self.speed=speed
+
+
+
+		self.rect.center=pos
+	def update(self):
+		self.pos += self.direction * self.speed *dt
+		self.rect.center=(round(self.pos.x),round(self.pos.y))
+
+		#self.pos.x-=10*dt
+		#self.rect.x=round(self.pos.x)
+		#self.pos += direction * speed * dt 
+		#self.pos.center =(round(self.pos.x),round(self.pos.y))
 		
 #Sprite Groups
-ifxManGroup = pygame.sprite.Group()
-
+spriteGroup = pygame.sprite.Group()
+cloudGroup = pygame.sprite.Group()
 
 
 #Sprite Creation
 hero = ifxMan()
-ifxManGroup.add(hero)
+#cloud = cloudClass()
+spriteGroup.add(hero)
+
+#cloudGroup.add(cloud)
 
 
 
 
-
-
-
+#Timers
+# Meteor timer sets an event every second, which will be used for spawning the clouds
+#CHANGE THE TIMER DURATION TO A VARIABLE JUST SO THE HIGHER THE SCORE THE LOWER THE SPAWNING PERIOD
+cloudTimer=pygame.event.custom_type()
+pygame.time.set_timer(cloudTimer,5000)
 
 
 
@@ -129,7 +162,7 @@ while True:  # run forever -> keeps our game running
 	# Only compute the delta if both values are present
 		if base_value is not None and controller_value is not None:
 			delta = int(controller_value - base_value)
-			print(f"Base Station Value: {base_value}, Dynamic Controller Value: {controller_value}, Delta: {delta}")
+			#print(f"Base Station Value: {base_value}, Dynamic Controller Value: {controller_value}, Delta: {delta}")
 
 			if delta > upperThreshold:
 				flagDown = True
@@ -151,11 +184,25 @@ while True:  # run forever -> keeps our game running
 			hero.rect.bottom += 2
 
 	for event in pygame.event.get():
+		
+
+
+		if(gameMode):
+			if(event.type==cloudTimer):
+				
+				cloudClass((1300,randint(100,500)),100, cloudGroup)				
+				print("schblanga")
+		
+			
+
 		if event.type == pygame.QUIT:
 			pygame.quit()
 			sys.exit()
 
-	clock.tick(120)
+
+	
+	clock.tick()
+	dt= clock.tick(120)/1000
 
 	# Update ifxMan position
 	hero.center = (200, posY)
@@ -163,10 +210,12 @@ while True:  # run forever -> keeps our game running
 	display_surface.fill((0, 0, 0))
 	display_surface.blit(bg_surf, (0, 0))
 
+	#Updating our Groups
+	cloudGroup.update()
 
 	#Drawing our Groups
-	ifxManGroup.draw(display_surface)
-	
+	spriteGroup.draw(display_surface)
+	cloudGroup.draw(display_surface)
 
 	#Add eventually a blit for the obstacles
 
