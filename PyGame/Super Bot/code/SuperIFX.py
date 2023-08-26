@@ -56,14 +56,14 @@ def display_score():
 
 
 #Serial Connection Initialisation
-base_station = serial.Serial('COM30', 9600, timeout=1)
-dynamic_controller = serial.Serial('COM36', 9600, timeout=1)
+base_station = serial.Serial('COM29', 9600, timeout=1)
+dynamic_controller = serial.Serial('COM31', 9600, timeout=1)
 
 def get_float_from_port(port):
-	"""Try reading a line from a port and convert to float."""
+	"""Try reading a line from a port and convert to float.""" 
 	try:
 		line = port.readline().decode().strip()
-		return float(line)
+		return int(line)
 	except ValueError:
 		print(f"Couldn't convert '{line}' to float.")
 		return None
@@ -93,11 +93,13 @@ class ifxMan(pygame.sprite.Sprite):
 		self.image=pygame.transform.scale_by(self.image, 0.1)
 		#3 we need a rect
 		self.rect = self.image.get_rect(midtop=(WINDOW_WIDTH / 4, WINDOW_HEIGHT / 2))
+		#Mask for collision Detection
+		self.mask= pygame.mask.from_surface(self.image)
 	score=0
 	
 
 	def collisionsWithClouds(self):
-		if pygame.sprite.spritecollide(self,cloudGroup,True):
+		if pygame.sprite.spritecollide(self,cloudGroup,True,pygame.sprite.collide_mask):
 
 			#print("Collision Detected")
 			return True			
@@ -114,6 +116,9 @@ class cloudClass(pygame.sprite.Sprite):
 
 		#Create the rectangle with the center being at the input pos
 		self.rect = self.image.get_rect(center=pos)
+
+		#Create A mask for collision Detection
+		self.mask= pygame.mask.from_surface(self.image)
 
 		#For smoother animation Float based positioning
 		#we take in position from the rectanle
@@ -199,7 +204,7 @@ while True:  # run forever -> keeps our game running
 	# Only compute the delta if both values are present
 		if base_value is not None and controller_value is not None:
 			delta = int(controller_value - base_value)
-			#print(f"Base Station Value: {base_value}, Dynamic Controller Value: {controller_value}, Delta: {delta}")
+			print(f"Base Station Value: {base_value}, Dynamic Controller Value: {controller_value}, Delta: {delta}")
 
 			if delta > upperThreshold:
 				flagDown = True
@@ -217,10 +222,10 @@ while True:  # run forever -> keeps our game running
 		
 
 		if hero.rect.top > 10 and flagUp:
-			hero.rect.top -= 2
+			hero.rect.top -= 4
 
 		if hero.rect.bottom < 1080 and flagDown:
-			hero.rect.bottom += 2
+			hero.rect.bottom += 4
 
 	for event in pygame.event.get():
 		
@@ -228,7 +233,7 @@ while True:  # run forever -> keeps our game running
 
 		if(gameMode):
 			if(event.type==cloudTimer):				
-				cloudClass((2200,randint(0,1080)),500, cloudGroup)				
+				cloudClass((2200,randint(0,1080)),score*50 +50, cloudGroup)				
 				print("schblanga")
 			if(event.type==scoreTimer):
 				score+=1

@@ -4,6 +4,14 @@ The goal of the project is to write a game where the user can play by vertically
     <img src="Photos/Game Start Screen.PNG" alt="Current Setup" width="720"/>
 </div>
 
+## Gameplay
++	Initially, the game will calibrate. A warning may be issued to keep the controller stationary.
++	Once calibrated, the game can be started with the 's' key.
++	The character moves up or down based on the motion detected from the controller.
++	Clouds spawn from the right and move towards the character.
++	If the character collides with a cloud, the game ends.
++	The objective is to avoid the clouds and get a high score.
+
 
 
 
@@ -76,6 +84,17 @@ for the game to run and the characters to appear the **firstCalibrationFlag** ha
 ```
 This code snippet runs right after the booting up the game it essentially captures 20 measurements (10 from each microcontroller) performs the delta calculation and takes the average of them. The user also has the option to recalibrate by pressing the keyboard buton '**a**' ; this resets the counterFirstCalibration variable to 0. 
 
+## Character 
 
 
 
+
+
+HC05 Dynamic Controller: 
+  SLAVE: 
+  ADDR: ADDR:98D3:31:F6D4DA
+
+
+
+HC05 Station:
+  
