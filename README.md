@@ -39,7 +39,7 @@ This setup allows maximum noise negation as only the difference delta between bo
 **ISSUE:**: Overtime the **delta** value drifts
 
 
-### Serial Comunication between microcontrollers and Computer
+### **Serial Comunication between microcontrollers and Computer**
 For serial communication we utilize the '**serial**' python module. 
 ```python
 import serial
@@ -73,7 +73,7 @@ def get_float_from_port(port):
 		controller_value = get_float_from_port(dynamic_controller)
 ```
 
-### calibration
+### **calibration**
 for the game to run and the characters to appear the **firstCalibrationFlag** has to be set to **True**. This ensures that calibration is performed at least once before gameplay starts.
 ``` python
 		if (counterFirstCalibration<10):
@@ -87,9 +87,10 @@ for the game to run and the characters to appear the **firstCalibrationFlag** ha
 ```
 This code snippet runs right after the booting up the game it essentially captures 20 measurements (10 from each microcontroller) performs the delta calculation and takes the average of them. The user also has the option to recalibrate by pressing the keyboard buton '**a**' ; this resets the counterFirstCalibration variable to 0. 
 
-# Characters
+## **Characters**
+Sprites are like the actors in a video game, representing characters or objects. Using them makes coding games more organized. They help in easily checking for overlaps or collisions, grouping similar objects together, creating animations, and ensuring the game runs smoothly. Think of them as the building blocks that make both designing and playing games seamless.
 
-## The ifxMan Class
+### **The ifxMan Class**
 This class represents the primary character (or sprite) that the player controls.
 
 +	**Initialization Method (__init__)**
@@ -110,7 +111,7 @@ This class represents the primary character (or sprite) that the player controls
 If a collision is detected, it returns True.
 
 
-## The cloudClass
+### **The cloudClass**
 This class represents the clouds (or obstacles) that spawn and move towards the ifxMan.
 
 +	**Initialization Method (__init__):**
@@ -132,9 +133,9 @@ The position of the cloud (self.pos) is updated based on its direction and speed
 If the cloud moves out of the screen (its right edge is less than 0), it gets destroyed (or 'killed') to save memory and processing.
 
 
-## Collision Detection
+### **Collision Detection**
 
-The actual collision detection is performed in the collisionsWithClouds method of the ifxMan class:
+The actual collision detection is performed in the **collisionsWithClouds** method of the **ifxMan** class:
 
 ```python
 def collisionsWithClouds(self):
@@ -151,15 +152,15 @@ def collisionsWithClouds(self):
 When a collision is detected, the **collisionsWithClouds** method returns **True**, indicating that the **ifxMan** character has collided with a cloud.
 
 
-## Spawning the Clouds
+### **Spawning the Clouds**
 The spawning mechanism for the clouds is event-driven, which means it's based on Pygame events. Specifically, there's a timer event set up to trigger the cloud spawning.
 
-### Custom Timer Event:
+#### **Custom Timer Event:**
 Firstly, a custom event type for the cloud spawning timer is created:
 ```python
 cloudTimer = pygame.event.custom_type()
 ```
-## Setting up the Timer:
+### **Setting up the Timer:**
 Then, the timer is set to trigger the cloudTimer event every 5000 milliseconds (or 5 seconds):
 
 ```python
@@ -167,7 +168,7 @@ pygame.time.set_timer(cloudTimer, 5000)
 ```
 This means that every 5 seconds, a **cloudTimer** event will be added to the Pygame event queue.
 
-## Handling the Timer Event:
+### **Handling the Timer Event:**
 Inside the main game loop, events are continuously polled and checked. Whenever the cloudTimer event occurs, a new cloud is spawned:
 ```python
 for event in pygame.event.get():
@@ -185,7 +186,7 @@ When the **cloudTimer** event is detected, the cloudClass is instantiated, effec
 +	**cloudGroup** is the sprite group to which the cloud sprite is added. Storing sprites in groups allows for easier batch processing of sprites, for operations such as drawing, updating, or collision checking
 
 
-## Off-screen Killing:
+### **Off-screen Killing:**
 Inside the **cloudClass** definition, there's an **update** method which ensures that if a cloud goes entirely off the screen to the left (i.e., its right edge **(self.rect.right)** is less than 0), it gets removed (or 'killed'):
 ```python
 if self.rect.right < 0:
@@ -194,11 +195,70 @@ if self.rect.right < 0:
 This is a good optimization. By removing sprites that are no longer visible or needed, you reduce the computational work and memory usage.
 
 
+## **ifxMan Motion**
 
+### **Data Retrieval for Motion:**
+The motion of the **ifxMan** character is determined based on the difference (delta) between values read from two serial ports, base_station and dynamic_controller. This difference determines whether the character should move up, move down, or stay in its position.
+```python
+if base_value is not None and controller_value is not None:
+    delta = int(controller_value - base_value)
+```
+### **Setting Motion Flags:**
+The character's motion is driven by two flags: **flagUp** and **flagDown**. Based on the value of **delta**, one of these flags is activated:
 
++	If **delta** is greater than the **upperThreshold**, **flagDown** is set to **True**, which will move the character down.
 
++	If **delta** is less than the **lowerThreshold**, **flagUp** is set to **True**, which will move the character up.
 
++	If **delta** is in between these thresholds, both flags are set to False, and the character remains stationary.
+### **Applying Motion:**
+The character's position is updated based on the flags:
+```python
+if hero.rect.top > 10 and flagUp:
+    hero.rect.top -= 4
 
+if hero.rect.bottom < 1080 and flagDown:
+    hero.rect.bottom += 4
+```
++	If **flagUp** is **True** and the character's top edge is more than 10 pixels from the top of the screen, the character moves up by 4 pixels.
+
++	If **flagDown** is **True** and the character's bottom edge is less than 1080 pixels from the bottom of the screen, the character moves down by 4 pixels.
+
+This motion logic allows for the vertical movement of the **ifxMan** character based on the difference in values read from the two serial ports. It ensures that the character does not move off the screen while providing a mechanism for player interaction.
+
+## **Score**
+### **Initialization**:
+The score starts at zero:
+```Python
+score = 0
+```
+### Score Incrementation:
+The Pygame's timer functionality is relied upon to create custom events. One such event, named **scoreTimer**, is set up to trigger every second (1000 milliseconds):
+```python
+scoreTimer = pygame.event.custom_type()
+pygame.time.set_timer(scoreTimer, 1000)
+```
+Inside the main game loop, whenever the **scoreTimer** event is detected, the score increments by one:
+```python
+if(event.type == scoreTimer):
+    score += 1
+```
+### **Displaying the Score:**
+The function **display_score()** is responsible for rendering the score on the screen. This function:
++	Formats the score as a string, e.g., "Score: 5".
++	Renders this string as a visual surface, using the specified font and color.
++	Draws a rectangle around the score, adding a visual touch.
++	Blits the score surface onto the main game screen at a specific location.
+Here's the key section of the **display_score()** function:
+
+```python
+score_text = f'Score: {score}'
+text_surf = font.render(score_text, True, (255, 255, 255))
+text_rect = text_surf.get_rect(midbottom=(WINDOW_WIDTH / 2, WINDOW_HEIGHT - 80))
+display_surface.blit(text_surf, text_rect)
+```
+### **Game Over Reset:**
+If there is a collision detected between the **ifxMan** character and any of the clouds, the game mode is set to **False** (effectively ending the game). The code does not reset the score to zero immediately upon collision, the score is shown below the start menu, however by pressing **s**, the game restarts and resets the score.
 
 
   
