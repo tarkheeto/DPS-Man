@@ -11,6 +11,7 @@ The goal of the project is to write a game where the user can play by vertically
 +	Clouds spawn from the right and move towards the character.
 +	If the character collides with a cloud, the game ends.
 +	The objective is to avoid the clouds and get a high score.
++	The higher the score the faster the clouds
 
 
 
@@ -84,7 +85,50 @@ for the game to run and the characters to appear the **firstCalibrationFlag** ha
 ```
 This code snippet runs right after the booting up the game it essentially captures 20 measurements (10 from each microcontroller) performs the delta calculation and takes the average of them. The user also has the option to recalibrate by pressing the keyboard buton '**a**' ; this resets the counterFirstCalibration variable to 0. 
 
-## Character 
+# Characters
+
+## The ifxMan Class
+This class represents the primary character (or sprite) that the player controls.
+
++	**Initialization Method (__init__)**
+
++	**super().__init__()**: This calls the initialization method of the parent class (pygame.sprite.Sprite), ensuring that all the built-in properties and methods of the Sprite class are inherited.
+
++	**self.image**: Loads the image of the character using pygame.image.load(). The convert_alpha() method ensures that the alpha channel (transparency) of the image is preserved.
+
++	**self.image=pygame.transform.scale_by(self.image, 0.1)**: This scales the image by 10%, making the sprite smaller.
+
++	**self.rect**: Retrieves a rectangular area from the image which will be used for positioning, collision detection, etc. It's set to appear in the middle top portion of the window.
+
++	**self.mask**: Creates a mask for the image. Masks are used in Pygame for pixel-perfect collision detection.
+
++	**collisionsWithClouds Method**: This method checks if the ifxMan sprite (or character) collides with any sprite in the cloudGroup.
+
++	**pygame.sprite.spritecollide()**: This function checks for collisions between a sprite and a group of sprites. The method returns a list of all Sprites in a Group that intersect with another Sprite. The pygame.sprite.collide_mask argument means that the method uses the mask for collision detection.
+If a collision is detected, it returns True.
+
+
+## The cloudClass
+This class represents the clouds (or obstacles) that spawn and move towards the ifxMan.
+
++	**Initialization Method (__init__):**
+Like with ifxMan, this class also inherits from pygame.sprite.Sprite.
+self.image: Loads the cloud image.
+self.image=pygame.transform.scale_by(self.image,0.8): Scales the cloud image by 80%.
+
++	**self.rect:** Gets the rectangular area of the cloud image and sets its position based on the pos argument provided when creating a cloud instance.
+self.mask: Generates a mask for the cloud, for pixel-perfect collision detection.
+
++	**self.pos:** Initializes the position of the cloud based on the rectangle's center. This is important for smooth animations.
+self.direction: Sets the movement direction of the cloud. In this case, it's set to move leftwards (-1, 0).
+
++	**self.speed:** Sets the movement speed of the cloud.
+update Method
+
++	**The update method** is called every game loop to update the cloud's position.
+The position of the cloud (self.pos) is updated based on its direction and speed. The dt factor ensures that movement is consistent regardless of how fast the loop runs.
+If the cloud moves out of the screen (its right edge is less than 0), it gets destroyed (or 'killed') to save memory and processing.
+
 
 
 
