@@ -1,5 +1,7 @@
 # IFX-Man
 The goal of the project is to write a game where the user can play by vertically moving a controller Up and Down. This vertical motion has to be captured and its respective data sent wirelessly to the game station, where a python game is to be played
+
+
 <div style="text-align:center">
     <img src="Photos/Game Start Screen.PNG" alt="Current Setup" width="720"/>
 </div>
@@ -94,7 +96,7 @@ This class represents the primary character (or sprite) that the player controls
 
 +	**super().__init__()**: This calls the initialization method of the parent class (pygame.sprite.Sprite), ensuring that all the built-in properties and methods of the Sprite class are inherited.
 
-+	**self.image**: Loads the image of the character using pygame.image.load(). The convert_alpha() method ensures that the alpha channel (transparency) of the image is preserved.
++	**self.image**: Loads the image of the character using **pygame.image.load()**. The convert_alpha() method ensures that the alpha channel (transparency) of the image is preserved.
 
 +	**self.image=pygame.transform.scale_by(self.image, 0.1)**: This scales the image by 10%, making the sprite smaller.
 
@@ -130,15 +132,73 @@ The position of the cloud (self.pos) is updated based on its direction and speed
 If the cloud moves out of the screen (its right edge is less than 0), it gets destroyed (or 'killed') to save memory and processing.
 
 
+## Collision Detection
+
+The actual collision detection is performed in the collisionsWithClouds method of the ifxMan class:
+
+```python
+def collisionsWithClouds(self):
+    if pygame.sprite.spritecollide(self, cloudGroup, True, pygame.sprite.collide_mask):
+        return True
+```
+
++	**pygame.sprite.spritecollide(...)**: This function checks for collisions between a sprite (the ifxMan in this case) and a group of sprites (the cloudGroup).
+
++	The **True** argument indicates that when a collision is detected, the collided sprite in the group should be removed (or 'killed'). This means a cloud will disappear upon colliding with the ifxMan.
+
++	**pygame.sprite.collide_mask**: This is a collision detection function that checks for collisions using masks (pixel-perfect collision detection). So, instead of just checking if the rectangles of the sprites overlap (which can be imprecise), it checks if the actual pixels (or filled parts) of the sprites overlap, ensuring a much more accurate collision detection.
+
+When a collision is detected, the **collisionsWithClouds** method returns **True**, indicating that the **ifxMan** character has collided with a cloud.
+
+
+## Spawning the Clouds
+The spawning mechanism for the clouds is event-driven, which means it's based on Pygame events. Specifically, there's a timer event set up to trigger the cloud spawning.
+
+### Custom Timer Event:
+Firstly, a custom event type for the cloud spawning timer is created:
+```python
+cloudTimer = pygame.event.custom_type()
+```
+## Setting up the Timer:
+Then, the timer is set to trigger the cloudTimer event every 5000 milliseconds (or 5 seconds):
+
+```python
+pygame.time.set_timer(cloudTimer, 5000)
+```
+This means that every 5 seconds, a **cloudTimer** event will be added to the Pygame event queue.
+
+## Handling the Timer Event:
+Inside the main game loop, events are continuously polled and checked. Whenever the cloudTimer event occurs, a new cloud is spawned:
+```python
+for event in pygame.event.get():
+    if gameMode:
+        if event.type == cloudTimer:
+            cloudClass((2200, randint(0, 1080)), score * 50 + 50, cloudGroup)
+            print("schblanga")
+```
+When the **cloudTimer** event is detected, the cloudClass is instantiated, effectively creating a new cloud sprite:
+
++	**(2200, randint(0, 1080))** sets the initial position of the cloud. The X-coordinate is **2200** (presumably off-screen to the right, so it moves into the view), and the Y-coordinate is randomly generated between **0** and **1080** to give vertical variety to the spawning.
+
++	**score * 50 + 50** is the speed parameter. As the score increases, clouds move faster, making the game progressively harder.
+
++	**cloudGroup** is the sprite group to which the cloud sprite is added. Storing sprites in groups allows for easier batch processing of sprites, for operations such as drawing, updating, or collision checking
+
+
+## Off-screen Killing:
+Inside the **cloudClass** definition, there's an **update** method which ensures that if a cloud goes entirely off the screen to the left (i.e., its right edge **(self.rect.right)** is less than 0), it gets removed (or 'killed'):
+```python
+if self.rect.right < 0:
+    self.kill()
+```
+This is a good optimization. By removing sprites that are no longer visible or needed, you reduce the computational work and memory usage.
 
 
 
 
-HC05 Dynamic Controller: 
-  SLAVE: 
-  ADDR: ADDR:98D3:31:F6D4DA
 
 
 
-HC05 Station:
+
+
   
