@@ -38,7 +38,8 @@ This setup allows maximum noise negation as only the difference delta between bo
 
 **ISSUE:**: Overtime the **delta** value drifts
 
-
+### **Required Libraries**
+In this project, a selection of libraries play a crucial role in orchestrating its functionality. Foremost among these is **pygame**, a widely celebrated library in the Python ecosystem, dedicated to game development. Pygame facilitates everything from rendering graphics and detecting collisions, to managing in-game events and displaying on-screen text. Complementing Pygame's capabilities, the **serial** library is leveraged to establish communication with hardware devices. It allows the game to fetch real-time data from serially connected devices, integrating physical motion into the gameplay. Additionally, Python's built-in libraries, such as **sys** and **random**, aid in system-specific functionalities and introduce randomness into the game respectively.
 ### **Serial Comunication between microcontrollers and Computer**
 For serial communication we utilize the '**serial**' python module. 
 ```python
@@ -232,7 +233,7 @@ The score starts at zero:
 ```Python
 score = 0
 ```
-### Score Incrementation:
+### **Score Incrementation:**
 The Pygame's timer functionality is relied upon to create custom events. One such event, named **scoreTimer**, is set up to trigger every second (1000 milliseconds):
 ```python
 scoreTimer = pygame.event.custom_type()
@@ -260,5 +261,60 @@ display_surface.blit(text_surf, text_rect)
 ### **Game Over Reset:**
 If there is a collision detected between the **ifxMan** character and any of the clouds, the game mode is set to **False** (effectively ending the game). The code does not reset the score to zero immediately upon collision, the score is shown below the start menu, however by pressing **s**, the game restarts and resets the score.
 
+## Programming the DPSKits2Go
+The DPSKit2Go is essentially a microcontroller evaluation board with a built in barometric pressure sensor. (essentially an XMC2Go hooked up with a DPSShield2Go in one PCB) for more info on the DPSKits2Go [click here!](https://www.hackster.io/Infineon_Team/pressure-sensors-2go-the-dps310-dps368-fda7c6)
 
+<div style="text-align:center">
+    <img src="Photos/DPSKit2Go.PNG" alt="DPSKit2Go" width="300"/>
+
+(Please note that there are two versions of the DPSKit2GO: the DPS310- and DPS368Kit2Go).
+</div>
+Library: We're using the Dps310.h library. This library gives us all the functions we need to easily talk to the DPS310 sensor without getting into the nitty-gritty of sensor communication.
+
+Setting up the Sensor:
+
+cpp
+Copy code
+Dps310 Dps310PressureSensor = Dps310();
+Think of this as creating a digital version (or object) of our physical DPS310 sensor. We'll use Dps310PressureSensor throughout the code to interact with the actual sensor.
+
+Startup Ritual:
+Inside the setup(), there are a couple of things we do:
+
+Start our serial communication. This is like opening up a chat line between the Arduino and our computer.
+Wait for this chat line (Serial) to be ready.
+Kick off the sensor with Dps310PressureSensor.begin(Wire). This is like turning on and setting up the sensor to start our measurements.
+Lastly, we print "Init complete!" to let ourselves know that everything's set up and ready to roll.
+The Action Happens in loop():
+Here's what's going on step by step:
+
+We set some variables (temperature, pressure, etc.) to store and process our data.
+oversampling = 7: This is like telling the sensor to take 7 measurements and average them out. More measurements might mean more accurate data.
+Now, we actually measure the pressure with measurePressureOnce. This function fetches the current pressure reading and pops it into the pressure variable.
+We convert the pressure (which might be a decimal) to a whole number.
+Print that whole number to our computer.
+Wait for a tiny bit (20ms) and then do it all over again!
+
+
+## Wireless Connectivity
+In the current stage of the project, wireless connectivity is definitely not essential. You could still run the same exact code while connecting the two DPS Kits by microusb to your computer of choice and everything will still run perfectly. (of course you'll have to change the COM Port numbers to suit your own) However in order to reduce the restriction from the USB cord I decided to use the HC 05 module, which is a bluetooth based transceiver that acts as a serial COM Port.
   
+<div style="text-align:center">
+    <img src="Photos/Hc05.PNG" alt="HC05 Module" width="150"/>
+
+</div>
+Whenever powered on, the HC05 (if set to slave mode (default)), will go into advertising mode. In this mode you could pair it with any device that has bluetooth. Using your computer system of choice (as long as you have bluetooth) you could pair with the module, which introduces two new COM ports to your system, one of which we will be using for our project. To find the one necessary you could flash the arduino code provided on your DPSKit2Go that is connected to the HC05 module. Make sure that the serial output of  the board is set to "On Board" instead of the computer. This will switch the UART Conversation from the pins that are involved in the USB Cable to the RX TX physical pins that are connected to the HC05 module. This also means that the serial monitor on your computer will not be able to read the values provided by the Kit if you connect it to your computer via USB Cable.
+<div style="text-align:center">
+    <img src="Photos/serialModeDPSKit.png" alt="HC05 Module" width="400"/>
+
+</div>
+After that you could use the arduino serial monitor with each of the two ports we gained from pairing with the HC05 and check which one receives pressure readings.
+
+## Circuit 
+The HC05 module requires only 4 pins to be connected for operation. Actually we could even connect only three. The UART TX and RX of the DPSKit gets connected to the RX and TX respectively of the HC05 module. (We could also just connect the TX of the DPSKit to the RX of the HC05, since the DPSKit is not receiving any values.)
+  
+<div style="text-align:center">
+    <img src="Photos/fritzingController.png" alt="HC05 Module" width="250"/>
+
+</div>
+To power the Kit a small power bank was used, which was powering the kit (and in turn powering the HC05) through the micro usb port on the DPSKit.
