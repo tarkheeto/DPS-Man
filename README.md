@@ -23,13 +23,13 @@ The goal of the project is to write a game where the user can play by vertically
 
 
 ## Current Setup
-2 XMC2Go each connected to a DPS310 sensor. Both uControllers are connected to a computer and both are simultaneously serially transmiting their air pressure readings.
+2 DPS310Kits2Go are connected to a computer and both are simultaneously serially transmitting their air pressure readings.
 
 <div style="text-align:center">
-    <img src="Photos/setupExplanation.PNG" alt="Current Setup" width="480"/>
+    <img src="Photos/SetupwithDPS.PNG" alt="Current Setup" width="480"/>
 </div>
 
-These two microcotrollers are setup as follows:
+These two kits are setup as follows:
    * station (placed on a reference surface)
    * Dynamic Controller (Held in the hand of the user)
 
@@ -40,21 +40,21 @@ The computer then calculates the difference delta between the pressure measured 
 This setup allows maximum noise negation as only the difference delta between both readings of the sensors is taken into account
 
 
-**ISSUE:**: Overtime the **delta** value drifts
+**ISSUE:**: Overtime the **delta** value drifts, so you have to recalibrate whenever the it is possible (for example whenever you lose)
 
 ### **Required Libraries**
 In this project, a selection of libraries play a crucial role in orchestrating its functionality. Foremost among these is **pygame**, a widely celebrated library in the Python ecosystem, dedicated to game development. Pygame facilitates everything from rendering graphics and detecting collisions, to managing in-game events and displaying on-screen text. Complementing Pygame's capabilities, the **serial** library is leveraged to establish communication with hardware devices. It allows the game to fetch real-time data from serially connected devices, integrating physical motion into the gameplay. Additionally, Python's built-in libraries, such as **sys** and **random**, aid in system-specific functionalities and introduce randomness into the game respectively.
-### **Serial Comunication between microcontrollers and Computer**
+### **Serial Communication between microcontrollers and Computer**
 For serial communication we utilize the '**serial**' python module. 
 ```python
 import serial
 ```
 **Initialization of Serial Ports:**
 ```python
-base_station = serial.Serial('COM30', 9600, timeout=1)
-dynamic_controller = serial.Serial('COM36', 9600, timeout=1)
+base_station = serial.Serial('COM29', 9600, timeout=1)
+dynamic_controller = serial.Serial('COM31', 9600, timeout=1)
 ```
-We already established in advance that the COM ports for the base station and dynamic controller are respectively **COM30** and **COM36**. So all we had to do was to write these two lines in order to inform our code. 
+We already established in advance that the COM ports for the base station and dynamic controller are respectively **COM29** and **COM31**. So all we had to do was to write these two lines in order to inform our code. 
 ```python
 def get_float_from_port(port):
 	"""Try reading a line from a port and convert to float."""
@@ -82,21 +82,24 @@ def get_float_from_port(port):
 for the game to run and the characters to appear the **firstCalibrationFlag** has to be set to **True**. This ensures that calibration is performed at least once before gameplay starts.
 ``` python
 		if (counterFirstCalibration<10):
-		  counterFirstCalibration+=1
-			bufFirstCalibration.add(int(controller_value - base_value))
+		    counterFirstCalibration+=1
+            bufFirstCalibration.add(int(controller_value - base_value))
 			if(counterFirstCalibration==10):
 				calibratedOffset=bufFirstCalibration.average()
 				upperThreshold = calibratedOffset + 2
 				lowerThreshold = calibratedOffset -2
 				firstCalibrationFlag=True
 ```
-This code snippet runs right after the booting up the game it essentially captures 20 measurements (10 from each microcontroller) performs the delta calculation and takes the average of them. The user also has the option to recalibrate by pressing the keyboard buton '**a**' ; this resets the counterFirstCalibration variable to 0. 
+This code snippet runs right after the booting up the game it essentially captures 20 measurements (10 from each microcontroller) performs the delta calculation and takes the average of them. The user also has the option to recalibrate by pressing the keyboard button '**a**' ; this resets the counterFirstCalibration variable to 0. 
 
 ## **Characters**
 Sprites are like the actors in a video game, representing characters or objects. Using them makes coding games more organized. They help in easily checking for overlaps or collisions, grouping similar objects together, creating animations, and ensuring the game runs smoothly. Think of them as the building blocks that make both designing and playing games seamless.
 
 ### **The ifxMan Class**
 This class represents the primary character (or sprite) that the player controls.
+<div style="text-align:center">
+    <img src="PyGame/Super Bot/graphics/ifxBotVertical.png" alt="Cloud" width="300"/>
+</div>
 
 +	**Initialization Method (__init__)**
 
@@ -104,7 +107,7 @@ This class represents the primary character (or sprite) that the player controls
 
 +	**self.image**: Loads the image of the character using **pygame.image.load()**. The convert_alpha() method ensures that the alpha channel (transparency) of the image is preserved.
 
-+	**self.image=pygame.transform.scale_by(self.image, 0.1)**: This scales the image by 10%, making the sprite smaller.
++	**self.image=pygame.transform.scale_by(self.image, 0.3)**: This scales the image by 30%, making the sprite smaller.
 
 +	**self.rect**: Retrieves a rectangular area from the image which will be used for positioning, collision detection, etc. It's set to appear in the middle top portion of the window.
 
@@ -119,19 +122,25 @@ If a collision is detected, it returns True.
 ### **The cloudClass**
 This class represents the clouds (or obstacles) that spawn and move towards the ifxMan.
 
+<div style="text-align:center">
+    <img src="PyGame/Super Bot/graphics/cloud.png" alt="Cloud" width="480"/>
+</div>
+
 +	**Initialization Method (__init__):**
 Like with ifxMan, this class also inherits from pygame.sprite.Sprite.
 self.image: Loads the cloud image.
 self.image=pygame.transform.scale_by(self.image,0.8): Scales the cloud image by 80%.
 
 +	**self.rect:** Gets the rectangular area of the cloud image and sets its position based on the pos argument provided when creating a cloud instance.
-self.mask: Generates a mask for the cloud, for pixel-perfect collision detection.
+
++   **self.mask**: Generates a mask for the cloud, for pixel-perfect collision detection.
 
 +	**self.pos:** Initializes the position of the cloud based on the rectangle's center. This is important for smooth animations.
-self.direction: Sets the movement direction of the cloud. In this case, it's set to move leftwards (-1, 0).
+
++  **self.direction**: Sets the movement direction of the cloud. In this case, it's set to move leftwards (-1, 0).
 
 +	**self.speed:** Sets the movement speed of the cloud.
-update Method
+
 
 +	**The update method** is called every game loop to update the cloud's position.
 The position of the cloud (self.pos) is updated based on its direction and speed. The dt factor ensures that movement is consistent regardless of how fast the loop runs.
@@ -181,7 +190,15 @@ for event in pygame.event.get():
         if event.type == cloudTimer:
             cloudClass((2200, randint(0, 1080)), score * 50 + 50, cloudGroup)
             cloudSpawnTimer-=300
+            if(cloudSpawnTimer<600):
+                cloudSpawnTimer=500
             pygame.time.set_timer(cloudTimer,cloudSpawnTimer)
+            if(score>20):
+                cloudClass((2200,randint(200,800)),score*80 +100, cloudGroup)	
+            if(score>35):
+                cloudClass((2200,randint(200,800)),score*80 +100, cloudGroup)	
+            if(score>50):
+                cloudClass((2200,randint(200,800)),score*80 +100, cloudGroup)
 ```
 When the **cloudTimer** event is detected, the cloudClass is instantiated, effectively creating a new cloud sprite:
 
@@ -193,7 +210,8 @@ When the **cloudTimer** event is detected, the cloudClass is instantiated, effec
 
 +   **CloudSpawnTimer** variable is decremented so that the period between the timer events is also decremented, making the game play more difficult
 
-
++  **Cloud Spawning Period Limitation**: As the score keeps rising the period between timer events is reduced, however the period is not to be set below 0.5 seconds.
++  **Amounts of Clouds spawned**: As the score grows higher, the amount of clouds spawned per time event rise up until 4 clouds per timer event. 
 
 
 ### **Off-screen Killing:**
@@ -282,27 +300,52 @@ Library: We're using the Dps310.h library. This library gives us all the functio
 
 Setting up the Sensor:
 
-cpp
-Copy code
+```cpp
+#include <Dps310.h>
+```
+This includes the header file for the Dps310 library, which provides functions and definitions needed to communicate with the DPS310 sensor.
+
+```cpp
 Dps310 Dps310PressureSensor = Dps310();
-Think of this as creating a digital version (or object) of our physical DPS310 sensor. We'll use Dps310PressureSensor throughout the code to interact with the actual sensor.
-
-Startup Ritual:
-Inside the setup(), there are a couple of things we do:
-
-Start our serial communication. This is like opening up a chat line between the Arduino and our computer.
-Wait for this chat line (Serial) to be ready.
-Kick off the sensor with Dps310PressureSensor.begin(Wire). This is like turning on and setting up the sensor to start our measurements.
-Lastly, we print "Init complete!" to let ourselves know that everything's set up and ready to roll.
-The Action Happens in loop():
-Here's what's going on step by step:
-
-We set some variables (temperature, pressure, etc.) to store and process our data.
-oversampling = 7: This is like telling the sensor to take 7 measurements and average them out. More measurements might mean more accurate data.
-Now, we actually measure the pressure with measurePressureOnce. This function fetches the current pressure reading and pops it into the pressure variable.
-We convert the pressure (which might be a decimal) to a whole number.
-Print that whole number to our computer.
-Wait for a tiny bit (20ms) and then do it all over again!
+```
+An instance (Dps310PressureSensor) of the Dps310 class is created. This object will be used to interact with the sensor.
+```cpp  
+void setup()
+{
+  Serial.begin(9600);
+  while (!Serial);
+  Dps310PressureSensor.begin(Wire);
+  Serial.println("Init complete!");
+}
+```
++   This is the **setup** function, which is called once when the Arduino starts.
++   **Serial.begin(9600);**: Initializes the serial communication with a baud rate of 9600.
++   **while (!Serial);**: Waits for the serial port to be ready.
++   **Dps310PressureSensor.begin(Wire);**: Initializes the Dps310PressureSensor object with the Wire library for I2C communication.
++   **Serial.println("Init complete!");**: Sends a message to the serial monitor to indicate successful initialization.
+```cpp
+void loop()
+{
+  float temperature;
+  float pressure;
+  int pressureInt;
+  uint8_t oversampling = 7;
+  int16_t ret;
+  ret = Dps310PressureSensor.measurePressureOnce(pressure, oversampling);  
+  Serial.println(pressure);
+  //Wait some time
+  delay(20);
+}
+```
+**void loop() { ... }:**
++   This is the main loop that runs repeatedly after the **setup** function.
++   **float temperature; float pressure;**: Declares two float variables to hold temperature and pressure readings. Note that the temperature variable isn't actually used in this code.
++   **int pressureInt;**: Declares an integer variable pressureInt which isn't used in this code snippet either.
++   **uint8_t oversampling = 7;**: Sets the oversampling rate to 7. Oversampling can improve the precision of measurements by taking multiple readings and averaging them.
++   **int16_t ret;**: Declares a 16-bit signed integer to store the return value from the measurePressureOnce function.
++   **ret = Dps310PressureSensor.measurePressureOnce(pressure, oversampling);**: Measures the pressure once using the specified oversampling rate. The measured pressure is stored in the pressure variable.
++   **Serial.println(pressure);**: Sends the measured pressure value to the serial monitor.
++   **delay(20);**: Introduces a delay of 20 milliseconds before the loop starts again.
 
 
 ## Wireless Connectivity

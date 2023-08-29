@@ -50,7 +50,6 @@ def display_score():
 	pygame.draw.rect(display_surface,(255,255,255),text_rect.inflate(30,30), width = 8, border_radius = 5)
 
 
-#Now we add a 'game screen'
 
 
 
@@ -152,7 +151,6 @@ spriteGroup.add(hero)
 
 #Timers
 # Meteor timer sets an event every second, which will be used for spawning the clouds
-#CHANGE THE TIMER DURATION TO A VARIABLE JUST SO THE HIGHER THE SCORE THE LOWER THE SPAWNING PERIOD
 cloudTimer=pygame.event.custom_type()
 pygame.time.set_timer(cloudTimer,cloudSpawnTimer)
 
@@ -174,8 +172,7 @@ while True:  # run forever -> keeps our game running
 		base_value = get_float_from_port(base_station)
 		controller_value = get_float_from_port(dynamic_controller)
 
-		#BOOT UP DELTA CALIBRATION
-		#IMPLEMENT A WARNING NOT TO MOVE THE CONTROLLER FROM THE SAME SURFACE AS THE BASE STATION
+
 		if (counterFirstCalibration<10):
 			counterFirstCalibration+=1
 			bufFirstCalibration.add(int(controller_value - base_value))
@@ -193,9 +190,6 @@ while True:  # run forever -> keeps our game running
 
 				
 	#Game only starts to run if the first calibration flag is set to true
-
-
-	#---------LATER INSERT CODE FOR ALSO PRESSING A KEYBOARD BUTTON TO START THE GAME WHICH WILL IN TURN SET A THE GAME MOD FLAG TO ON
 
 
 
@@ -234,7 +228,6 @@ while True:  # run forever -> keeps our game running
 		if(gameMode):
 			if(event.type==cloudTimer):				
 				cloudClass((2200,randint(200,800)),score*80 +100, cloudGroup)				
-				print("schblanga")
 				cloudSpawnTimer-=300
 				if(cloudSpawnTimer<600):
 					cloudSpawnTimer=500
