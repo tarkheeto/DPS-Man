@@ -37,7 +37,7 @@ lowerThreshold=0
 score=0
 
 
-
+cloudSpawnTimer=5000
 
 
 
@@ -63,7 +63,7 @@ def get_float_from_port(port):
 	"""Try reading a line from a port and convert to float.""" 
 	try:
 		line = port.readline().decode().strip()
-		return int(line)
+		return float(line)
 	except ValueError:
 		print(f"Couldn't convert '{line}' to float.")
 		return None
@@ -89,8 +89,8 @@ class ifxMan(pygame.sprite.Sprite):
 	def __init__(self):		
 		super().__init__()   #1 init the parent class
 		#2 we need a surface -> image
-		self.image = pygame.image.load('PyGame/Super Bot/graphics/ifxBotHorizontal.png').convert_alpha()
-		self.image=pygame.transform.scale_by(self.image, 0.1)
+		self.image = pygame.image.load('PyGame/Super Bot/graphics/ifxBotVertical.png').convert_alpha()
+		self.image=pygame.transform.scale_by(self.image, 0.3)
 		#3 we need a rect
 		self.rect = self.image.get_rect(midtop=(WINDOW_WIDTH / 4, WINDOW_HEIGHT / 2))
 		#Mask for collision Detection
@@ -154,7 +154,7 @@ spriteGroup.add(hero)
 # Meteor timer sets an event every second, which will be used for spawning the clouds
 #CHANGE THE TIMER DURATION TO A VARIABLE JUST SO THE HIGHER THE SCORE THE LOWER THE SPAWNING PERIOD
 cloudTimer=pygame.event.custom_type()
-pygame.time.set_timer(cloudTimer,5000)
+pygame.time.set_timer(cloudTimer,cloudSpawnTimer)
 
 scoreTimer=pygame.event.custom_type()
 pygame.time.set_timer(scoreTimer,1000)
@@ -181,8 +181,8 @@ while True:  # run forever -> keeps our game running
 			bufFirstCalibration.add(int(controller_value - base_value))
 			if(counterFirstCalibration==10):
 				calibratedOffset=bufFirstCalibration.average()
-				upperThreshold = calibratedOffset + 2
-				lowerThreshold = calibratedOffset -2
+				upperThreshold = calibratedOffset + 1
+				lowerThreshold = calibratedOffset -1
 				firstCalibrationFlag=True
 				print(f"Initial Calibration is succesfully done. Offset = {calibratedOffset} lT = {lowerThreshold} UT = {upperThreshold}")
 
@@ -233,8 +233,18 @@ while True:  # run forever -> keeps our game running
 
 		if(gameMode):
 			if(event.type==cloudTimer):				
-				cloudClass((2200,randint(0,1080)),score*50 +50, cloudGroup)				
+				cloudClass((2200,randint(200,800)),score*80 +100, cloudGroup)				
 				print("schblanga")
+				cloudSpawnTimer-=300
+				if(cloudSpawnTimer<600):
+					cloudSpawnTimer=500
+				pygame.time.set_timer(cloudTimer,cloudSpawnTimer)
+				if(score>20):
+					cloudClass((2200,randint(200,800)),score*80 +100, cloudGroup)	
+				if(score>35):
+					cloudClass((2200,randint(200,800)),score*80 +100, cloudGroup)	
+				if(score>50):
+					cloudClass((2200,randint(200,800)),score*80 +100, cloudGroup)
 			if(event.type==scoreTimer):
 				score+=1
 		
@@ -271,7 +281,7 @@ while True:  # run forever -> keeps our game running
 		if(hero.collisionsWithClouds()):
 			
 			gameMode=False
-			
+			cloudSpawnTimer=5000
 		#Updating our Groups
 		cloudGroup.update()
 		#Drawing our Groups

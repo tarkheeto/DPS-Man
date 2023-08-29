@@ -7,13 +7,17 @@ The goal of the project is to write a game where the user can play by vertically
 </div>
 
 ## Gameplay
+<div style="text-align:center">
+    <img src="Photos/Game_Screenshot.png" alt="Current Setup" width="720"/>
+</div>
+
 +	Initially, the game will calibrate. A warning may be issued to keep the controller stationary.
 +	Once calibrated, the game can be started with the 's' key.
 +	The character moves up or down based on the motion detected from the controller.
 +	Clouds spawn from the right and move towards the character.
 +	If the character collides with a cloud, the game ends.
 +	The objective is to avoid the clouds and get a high score.
-+	The higher the score the faster the clouds
++	The higher the score the faster the clouds move and spawn
 
 
 
@@ -165,7 +169,7 @@ cloudTimer = pygame.event.custom_type()
 Then, the timer is set to trigger the cloudTimer event every 5000 milliseconds (or 5 seconds):
 
 ```python
-pygame.time.set_timer(cloudTimer, 5000)
+pygame.time.set_timer(cloudTimer, cloudSpawnTimer)
 ```
 This means that every 5 seconds, a **cloudTimer** event will be added to the Pygame event queue.
 
@@ -176,7 +180,8 @@ for event in pygame.event.get():
     if gameMode:
         if event.type == cloudTimer:
             cloudClass((2200, randint(0, 1080)), score * 50 + 50, cloudGroup)
-            print("schblanga")
+            cloudSpawnTimer-=300
+            pygame.time.set_timer(cloudTimer,cloudSpawnTimer)
 ```
 When the **cloudTimer** event is detected, the cloudClass is instantiated, effectively creating a new cloud sprite:
 
@@ -185,6 +190,10 @@ When the **cloudTimer** event is detected, the cloudClass is instantiated, effec
 +	**score * 50 + 50** is the speed parameter. As the score increases, clouds move faster, making the game progressively harder.
 
 +	**cloudGroup** is the sprite group to which the cloud sprite is added. Storing sprites in groups allows for easier batch processing of sprites, for operations such as drawing, updating, or collision checking
+
++   **CloudSpawnTimer** variable is decremented so that the period between the timer events is also decremented, making the game play more difficult
+
+
 
 
 ### **Off-screen Killing:**

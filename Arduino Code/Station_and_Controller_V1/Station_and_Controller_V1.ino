@@ -22,9 +22,9 @@ void loop()
 
   ret = Dps310PressureSensor.measurePressureOnce(pressure, oversampling);
   
-  pressureInt= (int)pressure;
+  //pressureInt= (int)pressure;
 
-  Serial.println(pressureInt);
+  Serial.println(pressure);
 
 
   //Wait some time
