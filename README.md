@@ -1,4 +1,4 @@
-# IFX-Man
+# DPS-Man
 The goal of the project is to write a game where the user can play by vertically moving a controller Up and Down. This vertical motion has to be captured and its respective data sent wirelessly to the game station, where a python game is to be played
 
 
@@ -95,7 +95,7 @@ This code snippet runs right after the booting up the game it essentially captur
 ## **Characters**
 Sprites are like the actors in a video game, representing characters or objects. Using them makes coding games more organized. They help in easily checking for overlaps or collisions, grouping similar objects together, creating animations, and ensuring the game runs smoothly. Think of them as the building blocks that make both designing and playing games seamless.
 
-### **The ifxMan Class**
+### **The DPSMan Class**
 This class represents the primary character (or sprite) that the player controls.
 <div style="text-align:center">
     <img src="PyGame/Super Bot/graphics/ifxBotVertical.png" alt="Cloud" width="300"/>
@@ -113,21 +113,21 @@ This class represents the primary character (or sprite) that the player controls
 
 +	**self.mask**: Creates a mask for the image. Masks are used in Pygame for pixel-perfect collision detection.
 
-+	**collisionsWithClouds Method**: This method checks if the ifxMan sprite (or character) collides with any sprite in the cloudGroup.
++	**collisionsWithClouds Method**: This method checks if the DPSMan sprite (or character) collides with any sprite in the cloudGroup.
 
 +	**pygame.sprite.spritecollide()**: This function checks for collisions between a sprite and a group of sprites. The method returns a list of all Sprites in a Group that intersect with another Sprite. The pygame.sprite.collide_mask argument means that the method uses the mask for collision detection.
 If a collision is detected, it returns True.
 
 
 ### **The cloudClass**
-This class represents the clouds (or obstacles) that spawn and move towards the ifxMan.
+This class represents the clouds (or obstacles) that spawn and move towards the DPSMan.
 
 <div style="text-align:center">
     <img src="PyGame/Super Bot/graphics/cloud.png" alt="Cloud" width="480"/>
 </div>
 
 +	**Initialization Method (__init__):**
-Like with ifxMan, this class also inherits from pygame.sprite.Sprite.
+Like with DPSMan, this class also inherits from pygame.sprite.Sprite.
 self.image: Loads the cloud image.
 self.image=pygame.transform.scale_by(self.image,0.8): Scales the cloud image by 80%.
 
@@ -149,7 +149,7 @@ If the cloud moves out of the screen (its right edge is less than 0), it gets de
 
 ### **Collision Detection**
 
-The actual collision detection is performed in the **collisionsWithClouds** method of the **ifxMan** class:
+The actual collision detection is performed in the **collisionsWithClouds** method of the **DPSMan** class:
 
 ```python
 def collisionsWithClouds(self):
@@ -157,13 +157,13 @@ def collisionsWithClouds(self):
         return True
 ```
 
-+	**pygame.sprite.spritecollide(...)**: This function checks for collisions between a sprite (the ifxMan in this case) and a group of sprites (the cloudGroup).
++	**pygame.sprite.spritecollide(...)**: This function checks for collisions between a sprite (the DPSMan in this case) and a group of sprites (the cloudGroup).
 
-+	The **True** argument indicates that when a collision is detected, the collided sprite in the group should be removed (or 'killed'). This means a cloud will disappear upon colliding with the ifxMan.
++	The **True** argument indicates that when a collision is detected, the collided sprite in the group should be removed (or 'killed'). This means a cloud will disappear upon colliding with the DPSMan.
 
 +	**pygame.sprite.collide_mask**: This is a collision detection function that checks for collisions using masks (pixel-perfect collision detection). So, instead of just checking if the rectangles of the sprites overlap (which can be imprecise), it checks if the actual pixels (or filled parts) of the sprites overlap, ensuring a much more accurate collision detection.
 
-When a collision is detected, the **collisionsWithClouds** method returns **True**, indicating that the **ifxMan** character has collided with a cloud.
+When a collision is detected, the **collisionsWithClouds** method returns **True**, indicating that the **DPSMan** character has collided with a cloud.
 
 
 ### **Spawning the Clouds**
@@ -223,10 +223,10 @@ if self.rect.right < 0:
 This is a good optimization. By removing sprites that are no longer visible or needed, you reduce the computational work and memory usage.
 
 
-## **ifxMan Motion**
+## **DPSMan Motion**
 
 ### **Data Retrieval for Motion:**
-The motion of the **ifxMan** character is determined based on the difference (delta) between values read from two serial ports, base_station and dynamic_controller. This difference determines whether the character should move up, move down, or stay in its position.
+The motion of the **DPSMan** character is determined based on the difference (delta) between values read from two serial ports, base_station and dynamic_controller. This difference determines whether the character should move up, move down, or stay in its position.
 ```python
 if base_value is not None and controller_value is not None:
     delta = int(controller_value - base_value)
@@ -252,7 +252,7 @@ if hero.rect.bottom < 1080 and flagDown:
 
 +	If **flagDown** is **True** and the character's bottom edge is less than 1080 pixels from the bottom of the screen, the character moves down by 4 pixels.
 
-This motion logic allows for the vertical movement of the **ifxMan** character based on the difference in values read from the two serial ports. It ensures that the character does not move off the screen while providing a mechanism for player interaction.
+This motion logic allows for the vertical movement of the **DPSMan** character based on the difference in values read from the two serial ports. It ensures that the character does not move off the screen while providing a mechanism for player interaction.
 
 ## **Score**
 ### **Initialization**:
@@ -286,7 +286,7 @@ text_rect = text_surf.get_rect(midbottom=(WINDOW_WIDTH / 2, WINDOW_HEIGHT - 80))
 display_surface.blit(text_surf, text_rect)
 ```
 ### **Game Over Reset:**
-If there is a collision detected between the **ifxMan** character and any of the clouds, the game mode is set to **False** (effectively ending the game). The code does not reset the score to zero immediately upon collision, the score is shown below the start menu, however by pressing **s**, the game restarts and resets the score.
+If there is a collision detected between the **DPSMan** character and any of the clouds, the game mode is set to **False** (effectively ending the game). The code does not reset the score to zero immediately upon collision, the score is shown below the start menu, however by pressing **s**, the game restarts and resets the score.
 
 ## Programming the DPSKits2Go
 The DPSKit2Go is essentially a microcontroller evaluation board with a built in barometric pressure sensor. (essentially an XMC2Go hooked up with a DPSShield2Go in one PCB) for more info on the DPSKits2Go [click here!](https://www.hackster.io/Infineon_Team/pressure-sensors-2go-the-dps310-dps368-fda7c6)

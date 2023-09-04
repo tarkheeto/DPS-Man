@@ -75,7 +75,7 @@ def get_float_from_port(port):
 pygame.init()
 WINDOW_WIDTH, WINDOW_HEIGHT = 1920, 1080
 display_surface = pygame.display.set_mode((WINDOW_WIDTH, WINDOW_HEIGHT))
-pygame.display.set_caption('Super IFX')
+pygame.display.set_caption('DPS Man')
 clock = pygame.time.Clock()
 
 
@@ -84,11 +84,11 @@ font = pygame.font.Font('PyGame/Super Bot/graphics/subatomic.ttf', 50)
 
 
 #Sprites
-class ifxMan(pygame.sprite.Sprite):
+class DPSMan(pygame.sprite.Sprite):
 	def __init__(self):		
 		super().__init__()   #1 init the parent class
 		#2 we need a surface -> image
-		self.image = pygame.image.load('PyGame/Super Bot/graphics/ifxBotVertical.png').convert_alpha()
+		self.image = pygame.image.load('PyGame/DPSMan/graphics/DPSBotVertical.png').convert_alpha()
 		self.image=pygame.transform.scale_by(self.image, 0.3)
 		#3 we need a rect
 		self.rect = self.image.get_rect(midtop=(WINDOW_WIDTH / 4, WINDOW_HEIGHT / 2))
@@ -142,7 +142,7 @@ cloudGroup = pygame.sprite.Group()
 
 
 #Sprite Creation
-hero = ifxMan()
+hero = DPSMan()
 spriteGroup.add(hero)
 
 
@@ -264,7 +264,7 @@ while True:  # run forever -> keeps our game running
 	clock.tick()
 	dt= clock.tick(120)/1000
 
-	# Update ifxMan position
+	# Update DPSMan position
 	hero.center = (200, posY)
 
 	display_surface.fill((0, 0, 0))
