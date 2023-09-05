@@ -79,7 +79,7 @@ pygame.display.set_caption('DPS Man')
 clock = pygame.time.Clock()
 
 
-font = pygame.font.Font('PyGame/Super Bot/graphics/subatomic.ttf', 50)
+font = pygame.font.Font('PyGame/DPSMan/graphics/subatomic.ttf', 50)
 
 
 
@@ -88,8 +88,8 @@ class DPSMan(pygame.sprite.Sprite):
 	def __init__(self):		
 		super().__init__()   #1 init the parent class
 		#2 we need a surface -> image
-		self.image = pygame.image.load('PyGame/Super Bot/graphics/ifxBotVertical.png').convert_alpha()
-		self.image=pygame.transform.scale_by(self.image, 0.3)
+		self.image = pygame.image.load('PyGame/DPSMan/graphics/DPSBotVertical.png').convert_alpha()
+		self.image=pygame.transform.scale_by(self.image, 0.1)
 		#3 we need a rect
 		self.rect = self.image.get_rect(midtop=(WINDOW_WIDTH / 4, WINDOW_HEIGHT / 2))
 		#Mask for collision Detection
@@ -110,7 +110,7 @@ class DPSMan(pygame.sprite.Sprite):
 class cloudClass(pygame.sprite.Sprite):
 	def __init__(self,pos,speed,groups):
 		super().__init__(groups)
-		self.image=pygame.image.load('PyGame/Super Bot/graphics/cloud.png').convert_alpha()
+		self.image=pygame.image.load('PyGame/DPSMan/graphics/cloud.png').convert_alpha()
 		self.image=pygame.transform.scale_by(self.image,0.8)
 
 		#Create the rectangle with the center being at the input pos
@@ -157,8 +157,8 @@ pygame.time.set_timer(cloudTimer,cloudSpawnTimer)
 scoreTimer=pygame.event.custom_type()
 pygame.time.set_timer(scoreTimer,1000)
 
-bg_surf = pygame.image.load('PyGame/Super Bot/graphics/background.jpg').convert()
-startScreenSurf=pygame.image.load('PyGame/Super Bot/graphics/Start Screen.png').convert()
+bg_surf = pygame.image.load('PyGame/DPSMan/graphics/background.jpg').convert()
+startScreenSurf=pygame.image.load('PyGame/DPSMan/graphics/Start Screen.png').convert()
 
 posY = 360
 posX = 0
